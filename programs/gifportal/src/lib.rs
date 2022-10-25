@@ -26,21 +26,22 @@ pub mod gifportal {
     base_account.total_gifs += 1;
     Ok(())
    }
-   // Comment on Picture
+
+   // Comment on Picture and Rating for that Gif
    pub fn comment_gif(ctx: Context<AddComments>,feedback: String, rating: u64,gif_link: String) ->ProgramResult{
     let base_account = &mut ctx.accounts.base_account;
-    let user =  &mut ctx.accounts.user;
-
+    let user = &mut ctx.accounts.user;
     let feedbacks = Feedback{
         gif_comment: feedback,
         rating: rating,
         user_address: *user.to_account_info().key,
     };
-
-    base_account.gif_list[1].comments.push(feedbacks);
+    base_account.gif_feedback.push(feedbacks);
     base_account.total_comments += 1;
     Ok(())
    }
+
+   pub fn send_tips()
 }
 
 #[derive(Accounts)]
@@ -65,6 +66,8 @@ pub struct AddGif<'info>{
 pub struct AddComments<'info>{
     #[account(mut)]
     pub base_account: Account<'info, CommentAccount>,
+    #[account(mut)]
+    pub user:Signer<'info>
 }
 
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
