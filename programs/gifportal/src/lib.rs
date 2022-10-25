@@ -7,7 +7,6 @@ declare_id!("3iYPHRpMGesfBiYLS7pBWnhsXoywdYhMKh7ys5x9cLtU");
 pub mod gifportal {
     use super::*;
     // Array List of Gif is added here and thier.....
-
    pub fn start_stuf_off(ctx: Context<StartStuffOff>) -> ProgramResult{
     let base_account  = &mut ctx.accounts.base_account;
     base_account.total_gifs = 0;
@@ -41,7 +40,22 @@ pub mod gifportal {
     Ok(())
    }
 
-   pub fn send_tips()
+   pub fn send_tips(ctx: Context<SendTips> , amount: u64)-> ProgramResult{
+         let ix =   anchor_lang::solana_program::system_instruction::transfer(
+            &ctx.accounts.from.key(),
+            &ctx.accounts.to.key(),
+            amount
+         );
+         anchor_lang::solana_program::program::invoke(
+            &ix,
+            &[
+                ctx.accounts.from.to_account_info(),
+                ctx.accounts.to.to_account_info(),
+            ],
+         );
+
+    Ok(())
+   }
 }
 
 #[derive(Accounts)]
@@ -70,12 +84,23 @@ pub struct AddComments<'info>{
     pub user:Signer<'info>
 }
 
+#[derive(Accounts)]
+pub struct SendTips<'info>{
+    #[account(mut)]
+    from: Signer<'info>,
+    #[account(mut)]
+    to: Signer<'info>,
+    system_program: Program<'info,System>,
+
+}
+
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct ItemStruct{
     pub gif_link: String,
     pub user_address: Pubkey,
 
 }
+
 
 #[derive(Debug, Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct Feedback{
